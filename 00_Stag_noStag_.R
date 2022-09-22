@@ -8,6 +8,8 @@
 # Purpose: To get a forecast projection with different scenarios.  
 #----------------------------
 
+tini <- Sys.time()
+
 
 #----- Libraries
 suppressPackageStartupMessages({
@@ -152,3 +154,7 @@ fwrite(
   file = "./output/Stag_Forecast_by_Quarter.csv",
   sep = "|"
 )
+
+tend <- Sys.time(); tend - tini
+
+#------- END OF FILE -----------
