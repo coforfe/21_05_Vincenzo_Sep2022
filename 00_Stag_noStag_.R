@@ -8,8 +8,10 @@
 # Purpose: To get a forecast projection with different scenarios.  
 #----------------------------
 
-tini <- Sys.time()
+#--- Clean environment ---
+tidytable::inv_gc()
 
+tini <- Sys.time()
 
 #----- Libraries
 suppressPackageStartupMessages({
