@@ -30,7 +30,7 @@ suppressPackageStartupMessages({
 
 #---- Read files
 salesin <- fread("./data/01_Spain_sales_and_forecast_2022_09_20.csv")
-regress <- fread("./data/02_SpainMacroScenarios_Quarter_2022_09_20.csv")
+regress <- fread("./data/02_SpainMacroScenarios_2022_09_22.csv")
 
 #---- Transform and just select the needed columns.
 #---- Sales
@@ -159,4 +159,47 @@ fwrite(
 
 tend <- Sys.time(); tend - tini
 
+
+#------------------------------------------------------------
+#------------------- DIFFERENT CHARTS -----------------------
+#-- Residuals
+funChart <- function(fit_best, fcast_best, stag_flag) {
+  cbind("Regression Errors" = residuals(fit_best, type = "regression"),
+        "ARIMA errors" = residuals(fit_best, type = "innovation")) %>%
+    autoplot(facets = TRUE) +
+    labs( title = paste("RESIDUALS - ", stag_flag, sep = " ") ) +
+    theme_bw()
+  ggsave(paste("./charts/", stag_flag, "_Residuals_.png", sep = ""))    
+  
+  checkresiduals(fit_best) +
+    theme_bw()
+  ggsave(paste("./charts/", stag_flag, "_Residuals_extended_.png", sep = ""))    
+  
+  #---- Forecast 
+  autoplot(fcast_best) +
+    labs(
+         x = "Year" , 
+         title = paste("FORECAST - ", stag_flag, sep = " ")
+        ) 
+    theme_bw()
+  ggsave(paste("./charts/", stag_flag, "_Dynamic_Evolution_Forecast.png", sep = ""))      
+  
+  #----- Fitted
+  fit_gr <- autoplot(datininona_ts[, "salestofore"]) + 
+    labs(
+      title = "SALES FITTED",
+      y = "Total Revenues",
+      x = "Year-Month"
+    ) + 
+    autolayer(fit_best$fitted, colour = TRUE) +
+    guides(colour = guide_legend(title = "Adjusted: ")) +
+    theme_bw() +
+    theme(legend.position = "bottom") 
+  print(fit_gr)
+  ggsave(paste("./charts/", stag_flag, "_Fitted_.png", sep = ""))    
+  
+}
+  
+funChart(fit_nostag, fcast_nostag, "NO-STAG")
+funChart(fit_stag,   fcast_stag,   "STAG")
 #------- END OF FILE -----------
